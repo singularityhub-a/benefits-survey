@@ -1,0 +1,141 @@
+/* Типографика */
+.survey-title {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #000;
+}
+
+.survey-subtitle {
+  font-size: 20px;
+  font-weight: 400;
+  color: #475569;
+}
+
+.survey-counter {
+  font-size: 18px;
+  color: #64748b;
+}
+
+/* Кнопки */
+.survey-button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  margin: 8px 0;
+  font-size: 18px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.survey-button:hover {
+  background: #f8fafc;
+}
+
+.survey-button.selected {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.survey-button.action {
+  background: #334155;
+  color: white;
+  font-weight: 600;
+}
+
+.survey-button.action:hover {
+  background: #1e293b;
+}
+
+.survey-button.action:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* Инпуты */
+.survey-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.survey-input::placeholder {
+  color: #94a3b8;
+}
+
+/* Карточки для оценки */
+.rating-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.rating-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.rating-status {
+  font-size: 16px;
+  color: #64748b;
+}
+
+.rating-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.rating-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 16px;
+  background: #fff;
+}
+
+.rating-button.selected {
+  background: #334155;
+  color: white;
+  border-color: #334155;
+}
+
+.rating-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Контейнеры */
+.survey-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.survey-section {
+  margin: 24px 0;
+}
+
+/* Сообщения об ошибках */
+.survey-error {
+  padding: 12px;
+  margin-top: 16px;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 16px;
+}
