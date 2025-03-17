@@ -247,7 +247,7 @@ const Survey = () => {
     };
 
     try {
-        const response = await fetch('http://localhost:8000/api/survey/', {
+        const response = await fetch('https://benefits-survey.onrender.com/api/survey/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
