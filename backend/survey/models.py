@@ -4,7 +4,7 @@ from django.db import models
 class SurveyResponse(models.Model):
     first_name = models.CharField(max_length=50, verbose_name="Имя")
     last_name = models.CharField(max_length=50, verbose_name="Фамилия")
-    email = models.EmailField(unique=False, verbose_name="Email")
+    email = models.EmailField(unique=False, verbose_name="Email", blank=True, null=True)
     institution = models.CharField(max_length=150, verbose_name="Место обучения")
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Время ответа")
 
