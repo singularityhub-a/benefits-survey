@@ -227,6 +227,7 @@ const Survey = () => {
 //         setIsSubmitting(false);
 //     }
 // };
+  const [loadingMessage, setLoadingMessage] = useState("");
   const handleSubmit = async () => {
     if (Object.keys(ratings).length !== selectedBenefits.length) {
         setError('Пожалуйста, оцените все выбранные преимущества');
@@ -234,6 +235,7 @@ const Survey = () => {
     }
 
     setIsSubmitting(true);
+    setLoadingMessage("⏳ Отправка данных... Пожалуйста, не перезагружайте страницу.");
     setError('');
 
     const data = {
@@ -260,9 +262,11 @@ const Survey = () => {
             return;
         }
 
+        setLoadingMessage("");
         setStep(4);  // Переход на страницу благодарности
     } catch (error) {
         setError('Ошибка: ' + error.message);
+        setLoadingMessage("");
     } finally {
         setIsSubmitting(false);
     }
@@ -483,6 +487,11 @@ const Survey = () => {
       {error && step !== 4 && (
         <div className="survey-error">{error}</div>
       )}
+      {loadingMessage && (
+        <div className="loading-warning">
+            {loadingMessage}
+        </div>
+       )}
     </div>
   );
 };
