@@ -239,6 +239,7 @@ const Survey = () => {
     const data = {
         first_name: personalInfo.firstName,
         last_name: personalInfo.lastName,
+        email: personalInfo.email,
         institution: personalInfo.educationType + (personalInfo.grade ? `, ${personalInfo.grade}` : ''),
         benefits: selectedBenefits.map((benefit) => ({
             benefit: benefit,

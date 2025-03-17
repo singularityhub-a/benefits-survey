@@ -6,12 +6,13 @@ class SelectedBenefitSerializer(serializers.ModelSerializer):
         model = SelectedBenefit
         fields = ['benefit', 'priority']
 
+
 class SurveyResponseSerializer(serializers.ModelSerializer):
     benefits = SelectedBenefitSerializer(many=True)
 
     class Meta:
         model = SurveyResponse
-        fields = ['id', 'first_name', 'last_name', 'institution', 'timestamp', 'benefits']
+        fields = ['id', 'first_name', 'last_name', 'email', 'institution', 'timestamp', 'benefits',]
 
     def create(self, validated_data):
         benefits_data = validated_data.pop('benefits')
