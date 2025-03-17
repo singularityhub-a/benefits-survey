@@ -185,6 +185,48 @@ const Survey = () => {
     return !Object.values(ratings).includes(rating);
   };
 
+//   const handleSubmit = async () => {
+//     if (Object.keys(ratings).length !== selectedBenefits.length) {
+//         setError('Пожалуйста, оцените все выбранные преимущества');
+//         return;
+//     }
+//
+//     setIsSubmitting(true);
+//     setError('');
+//
+//     try {
+//         // Формируем данные в том же формате, что и CSV
+//         const timestamp = new Date().toISOString();
+//         const formattedData = selectedBenefits.map(benefit => ({
+//             Timestamp: timestamp,
+//             'Имя': personalInfo.firstName,
+//             'Фамилия': personalInfo.lastName,
+//             'Email': personalInfo.email,
+//             'Тип обучения': personalInfo.educationType,
+//             'Класс': personalInfo.grade || 'Н/Д',
+//             'Преимущество': benefit,
+//             'Приоритет': ratings[benefit]
+//         }));
+//
+//         // Отправляем массив данных на сервер
+//         const response = await fetch('https://survey-backend-bqee.onrender.com', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify(formattedData) // Отправляем JSON-массив
+//         });
+//
+//         const data = await response.json();
+//         if (!response.ok) throw new Error(data.message);
+//
+//         // Если отправка успешна, показываем страницу благодарности
+//         setStep(4);
+//     } catch (error) {
+//         console.error('Ошибка:', error);
+//         setError('Ошибка при отправке данных.');
+//     } finally {
+//         setIsSubmitting(false);
+//     }
+// };
   const handleSubmit = async () => {
     if (Object.keys(ratings).length !== selectedBenefits.length) {
         setError('Пожалуйста, оцените все выбранные преимущества');
@@ -194,39 +236,37 @@ const Survey = () => {
     setIsSubmitting(true);
     setError('');
 
-    try {
-        // Формируем данные в том же формате, что и CSV
-        const timestamp = new Date().toISOString();
-        const formattedData = selectedBenefits.map(benefit => ({
-            Timestamp: timestamp,
-            'Имя': personalInfo.firstName,
-            'Фамилия': personalInfo.lastName,
-            'Email': personalInfo.email,
-            'Тип обучения': personalInfo.educationType,
-            'Класс': personalInfo.grade || 'Н/Д',
-            'Преимущество': benefit,
-            'Приоритет': ratings[benefit]
-        }));
+    const data = {
+        first_name: personalInfo.firstName,
+        last_name: personalInfo.lastName,
+        institution: personalInfo.educationType + (personalInfo.grade ? `, ${personalInfo.grade}` : ''),
+        benefits: selectedBenefits.map((benefit) => ({
+            benefit: benefit,
+            priority: ratings[benefit]
+        }))
+    };
 
-        // Отправляем массив данных на сервер
-        const response = await fetch('https://survey-backend-bqee.onrender.com', { 
+    try {
+        const response = await fetch('http://localhost:8000/api/survey/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formattedData) // Отправляем JSON-массив
+            body: JSON.stringify(data)
         });
 
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message);
+        if (!response.ok) {
+            const errorData = await response.json();
+            setError('Ошибка при отправке данных: ' + JSON.stringify(errorData));
+            return;
+        }
 
-        // Если отправка успешна, показываем страницу благодарности
-        setStep(4);
+        setStep(4);  // Переход на страницу благодарности
     } catch (error) {
-        console.error('Ошибка:', error);
-        setError('Ошибка при отправке данных.');
+        setError('Ошибка: ' + error.message);
     } finally {
         setIsSubmitting(false);
     }
 };
+
 
   return (
     <div className="survey-container">
