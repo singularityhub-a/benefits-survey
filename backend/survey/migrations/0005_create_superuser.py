@@ -19,7 +19,7 @@ def create_superuser(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('yourapp', 'previous_migration_name'),  # Замени на последнюю миграцию
+        ('survey', '0004_surveyresponse_email'),  # Замени на последнюю миграцию
     ]
 
     operations = [
