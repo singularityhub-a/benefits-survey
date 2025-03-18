@@ -30,6 +30,8 @@ const Survey = () => {
   // Варианты классов
   const grades = ["7 класс", "8 класс", "9 класс", "10 класс", "11 класс"];
 
+  const course = ["1 курс", "2 курс", "3 курс", "4 курс", "5 курс"]
+
   useEffect(() => {
     const loadBenefits = async () => {
       try {
@@ -63,14 +65,23 @@ const Survey = () => {
     }));
   };
 
+//   const handleEducationTypeSelect = (type) => {
+//     setPersonalInfo(prev => ({
+//       ...prev,
+//       educationType: type,
+//       // Если выбран не "Школа", то сбрасываем класс
+//       grade: type === "Школа" ? prev.grade : ''
+//     }));
+//   };
+
   const handleEducationTypeSelect = (type) => {
-    setPersonalInfo(prev => ({
-      ...prev,
-      educationType: type,
-      // Если выбран не "Школа", то сбрасываем класс
-      grade: type === "Школа" ? prev.grade : ''
-    }));
-  };
+      setPersonalInfo(prev => ({
+        ...prev,
+        educationType: type,
+        grade: ''
+      }));
+    };
+
 
   const handleGradeSelect = (grade) => {
     setPersonalInfo(prev => ({
@@ -96,20 +107,39 @@ const Survey = () => {
     setStep(1);
   };
 
+//   const handleEducationStep = () => {
+//     if (!personalInfo.educationType) {
+//       setError('Пожалуйста, выберите место обучения');
+//       return;
+//     }
+//
+//     if (personalInfo.educationType === "Школа" && !personalInfo.grade) {
+//       setError('Пожалуйста, выберите класс');
+//       return;
+//     }
+//
+//     setError('');
+//     setStep(2);
+//   };
   const handleEducationStep = () => {
-    if (!personalInfo.educationType) {
-      setError('Пожалуйста, выберите место обучения');
-      return;
-    }
-    
-    if (personalInfo.educationType === "Школа" && !personalInfo.grade) {
-      setError('Пожалуйста, выберите класс');
-      return;
-    }
-    
-    setError('');
-    setStep(2);
-  };
+      if (!personalInfo.educationType) {
+        setError('Пожалуйста, выберите место обучения');
+        return;
+      }
+
+      if (
+        (personalInfo.educationType === "Школа" ||
+         personalInfo.educationType === "Колледж" ||
+         personalInfo.educationType === "ВУЗ") && !personalInfo.grade
+      ) {
+        setError(`Пожалуйста, выберите ${personalInfo.educationType === 'Школа' ? 'класс' : 'курс'}`);
+        return;
+      }
+
+      setError('');
+      setStep(2);
+    };
+
 
   const getCustomBenefitsCount = () => {
     return selectedBenefits.filter(b => b.startsWith("Другое:")).length;
@@ -336,22 +366,25 @@ const Survey = () => {
             </div>
           </div>
 
-          {personalInfo.educationType === "Школа" && (
-            <div className="survey-section">
-              <label className="survey-subtitle">Класс</label>
-              <div className="survey-section">
-                {grades.map(grade => (
-                  <button
-                    key={grade}
-                    className={`survey-button ${personalInfo.grade === grade ? 'selected' : ''}`}
-                    onClick={() => handleGradeSelect(grade)}
-                  >
-                    {grade}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          {(personalInfo.educationType === "Школа" || personalInfo.educationType === "Колледж" || personalInfo.educationType === "ВУЗ") && (
+      <div className="survey-section">
+        <label className="survey-subtitle">
+          {personalInfo.educationType === "Школа" ? "Класс" : "Курс"}
+        </label>
+        <div className="survey-section">
+          {(personalInfo.educationType === "Школа" ? grades : course).map(level => (
+            <button
+              key={level}
+              className={`survey-button ${personalInfo.grade === level ? 'selected' : ''}`}
+              onClick={() => handleGradeSelect(level)}
+            >
+              {level}
+            </button>
+          ))}
+        </div>
+      </div>
+    )}
+
 
           <button 
             className="survey-button action"
