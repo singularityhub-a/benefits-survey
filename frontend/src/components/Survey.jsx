@@ -280,7 +280,7 @@ const Survey = () => {
     };
 
     try {
-        const response = await fetch('https://benefits-survey.onrender.com/api/survey/', {
+        const response = await fetch('https://benefits-survey-czag.onrender.com/api/survey/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
