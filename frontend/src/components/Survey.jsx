@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 import '../styles/survey.css';
 
 const Survey = () => {
-  // Шаги: 0 - имя/фамилия/почта, 1 - выбор категории и класса, 2 - выбор преимуществ, 3 - ранжирование, 4 - благодарность
+  // Шаги: 0 - имя/фамилия/почта, 1 - выбор категории и класса, 1.5 - дополнительные вопросы для 9 класса, 2 - выбор преимуществ, 3 - ранжирование, 4 - благодарность
   const [step, setStep] = useState(0);
   
   const [personalInfo, setPersonalInfo] = useState({
@@ -13,7 +13,10 @@ const Survey = () => {
     lastName: '',
     email: '',
     educationType: '', // школа, колледж, вуз, родитель
-    grade: '' // для школьников
+    grade: '', // для школьников
+    postNinthGradePlan: '', // планы после 9 класса
+    customPostNinthGradePlan: '', // для варианта "другое"
+    consideringDirection: '' // направление, которое рассматривает
   });
   
   const [randomizedBenefits, setRandomizedBenefits] = useState([]);
@@ -23,6 +26,7 @@ const Survey = () => {
   const [ratings, setRatings] = useState({});
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("");
 
   // Варианты образования
   const educationTypes = ["Школа", "Колледж", "ВУЗ", "Я - родитель"];
@@ -30,7 +34,18 @@ const Survey = () => {
   // Варианты классов
   const grades = ["7 класс", "8 класс", "9 класс", "10 класс", "11 класс"];
 
-  const course = ["1 курс", "2 курс", "3 курс", "4 курс", "5 курс"]
+  const course = ["1 курс", "2 курс", "3 курс", "4 курс", "5 курс"];
+  
+  // Варианты планов после 9 класса
+  const postNinthGradePlans = [
+    "остаться в своей школе",
+    "пойти в колледж",
+    "перейти в другую школу",
+    "никуда не пойду",
+    "буду работать",
+    "пока не решил(а)",
+    "другое"
+  ];
 
   useEffect(() => {
     const loadBenefits = async () => {
@@ -65,28 +80,26 @@ const Survey = () => {
     }));
   };
 
-//   const handleEducationTypeSelect = (type) => {
-//     setPersonalInfo(prev => ({
-//       ...prev,
-//       educationType: type,
-//       // Если выбран не "Школа", то сбрасываем класс
-//       grade: type === "Школа" ? prev.grade : ''
-//     }));
-//   };
-
   const handleEducationTypeSelect = (type) => {
-      setPersonalInfo(prev => ({
-        ...prev,
-        educationType: type,
-        grade: ''
-      }));
-    };
-
+    setPersonalInfo(prev => ({
+      ...prev,
+      educationType: type,
+      grade: ''
+    }));
+  };
 
   const handleGradeSelect = (grade) => {
     setPersonalInfo(prev => ({
       ...prev,
       grade: grade
+    }));
+  };
+
+  const handlePostNinthGradePlanSelect = (plan) => {
+    setPersonalInfo(prev => ({
+      ...prev,
+      postNinthGradePlan: plan,
+      customPostNinthGradePlan: plan !== "другое" ? "" : prev.customPostNinthGradePlan
     }));
   };
 
@@ -107,39 +120,45 @@ const Survey = () => {
     setStep(1);
   };
 
-//   const handleEducationStep = () => {
-//     if (!personalInfo.educationType) {
-//       setError('Пожалуйста, выберите место обучения');
-//       return;
-//     }
-//
-//     if (personalInfo.educationType === "Школа" && !personalInfo.grade) {
-//       setError('Пожалуйста, выберите класс');
-//       return;
-//     }
-//
-//     setError('');
-//     setStep(2);
-//   };
   const handleEducationStep = () => {
-      if (!personalInfo.educationType) {
-        setError('Пожалуйста, выберите место обучения');
-        return;
-      }
+    if (!personalInfo.educationType) {
+      setError('Пожалуйста, выберите место обучения');
+      return;
+    }
 
-      if (
-        (personalInfo.educationType === "Школа" ||
-         personalInfo.educationType === "Колледж" ||
-         personalInfo.educationType === "ВУЗ") && !personalInfo.grade
-      ) {
-        setError(`Пожалуйста, выберите ${personalInfo.educationType === 'Школа' ? 'класс' : 'курс'}`);
-        return;
-      }
+    if (
+      (personalInfo.educationType === "Школа" ||
+       personalInfo.educationType === "Колледж" ||
+       personalInfo.educationType === "ВУЗ") && !personalInfo.grade
+    ) {
+      setError(`Пожалуйста, выберите ${personalInfo.educationType === 'Школа' ? 'класс' : 'курс'}`);
+      return;
+    }
 
-      setError('');
+    setError('');
+    
+    // Если выбрана школа и 9 класс, переходим на дополнительный шаг
+    if (personalInfo.educationType === "Школа" && personalInfo.grade === "9 класс") {
+      setStep(1.5);
+    } else {
       setStep(2);
-    };
-
+    }
+  };
+  
+  const handlePostNinthGradeStep = () => {
+    if (!personalInfo.postNinthGradePlan) {
+      setError('Пожалуйста, выберите один из вариантов');
+      return;
+    }
+    
+    if (personalInfo.postNinthGradePlan === "другое" && !personalInfo.customPostNinthGradePlan.trim()) {
+      setError('Пожалуйста, укажите свой вариант');
+      return;
+    }
+    
+    setError('');
+    setStep(2);
+  };
 
   const getCustomBenefitsCount = () => {
     return selectedBenefits.filter(b => b.startsWith("Другое:")).length;
@@ -211,53 +230,6 @@ const Survey = () => {
     });
   };
 
-  const isRatingAvailable = (rating) => {
-    return !Object.values(ratings).includes(rating);
-  };
-
-//   const handleSubmit = async () => {
-//     if (Object.keys(ratings).length !== selectedBenefits.length) {
-//         setError('Пожалуйста, оцените все выбранные преимущества');
-//         return;
-//     }
-//
-//     setIsSubmitting(true);
-//     setError('');
-//
-//     try {
-//         // Формируем данные в том же формате, что и CSV
-//         const timestamp = new Date().toISOString();
-//         const formattedData = selectedBenefits.map(benefit => ({
-//             Timestamp: timestamp,
-//             'Имя': personalInfo.firstName,
-//             'Фамилия': personalInfo.lastName,
-//             'Email': personalInfo.email,
-//             'Тип обучения': personalInfo.educationType,
-//             'Класс': personalInfo.grade || 'Н/Д',
-//             'Преимущество': benefit,
-//             'Приоритет': ratings[benefit]
-//         }));
-//
-//         // Отправляем массив данных на сервер
-//         const response = await fetch('https://survey-backend-bqee.onrender.com', {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify(formattedData) // Отправляем JSON-массив
-//         });
-//
-//         const data = await response.json();
-//         if (!response.ok) throw new Error(data.message);
-//
-//         // Если отправка успешна, показываем страницу благодарности
-//         setStep(4);
-//     } catch (error) {
-//         console.error('Ошибка:', error);
-//         setError('Ошибка при отправке данных.');
-//     } finally {
-//         setIsSubmitting(false);
-//     }
-// };
-  const [loadingMessage, setLoadingMessage] = useState("");
   const handleSubmit = async () => {
     if (Object.keys(ratings).length !== selectedBenefits.length) {
         setError('Пожалуйста, оцените все выбранные преимущества');
@@ -268,11 +240,28 @@ const Survey = () => {
     setLoadingMessage("⏳ Отправка данных... Пожалуйста, не перезагружайте страницу.");
     setError('');
 
+    // Формируем информацию о месте обучения с учетом дополнительных данных для 9 класса
+    let institutionInfo = personalInfo.educationType + (personalInfo.grade ? `, ${personalInfo.grade}` : '');
+    
+    // Добавляем информацию о планах после 9 класса, если она есть
+    if (personalInfo.postNinthGradePlan) {
+      const postNinthPlan = personalInfo.postNinthGradePlan === "другое" 
+        ? `другое: ${personalInfo.customPostNinthGradePlan}` 
+        : personalInfo.postNinthGradePlan;
+      
+      institutionInfo += `, планы: ${postNinthPlan}`;
+    }
+    
+    // Добавляем информацию о направлении, если она есть
+    if (personalInfo.consideringDirection) {
+      institutionInfo += `, направление: ${personalInfo.consideringDirection}`;
+    }
+
     const data = {
         first_name: personalInfo.firstName,
         last_name: personalInfo.lastName,
         email: personalInfo.email,
-        institution: personalInfo.educationType + (personalInfo.grade ? `, ${personalInfo.grade}` : ''),
+        institution: institutionInfo,
         benefits: selectedBenefits.map((benefit) => ({
             benefit: benefit,
             priority: ratings[benefit]
@@ -300,7 +289,7 @@ const Survey = () => {
     } finally {
         setIsSubmitting(false);
     }
-};
+  };
 
 
   return (
@@ -367,28 +356,78 @@ const Survey = () => {
           </div>
 
           {(personalInfo.educationType === "Школа" || personalInfo.educationType === "Колледж" || personalInfo.educationType === "ВУЗ") && (
-      <div className="survey-section">
-        <label className="survey-subtitle">
-          {personalInfo.educationType === "Школа" ? "Класс" : "Курс"}
-        </label>
-        <div className="survey-section">
-          {(personalInfo.educationType === "Школа" ? grades : course).map(level => (
-            <button
-              key={level}
-              className={`survey-button ${personalInfo.grade === level ? 'selected' : ''}`}
-              onClick={() => handleGradeSelect(level)}
-            >
-              {level}
-            </button>
-          ))}
-        </div>
-      </div>
-    )}
-
+            <div className="survey-section">
+              <label className="survey-subtitle">
+                {personalInfo.educationType === "Школа" ? "Класс" : "Курс"}
+              </label>
+              <div className="survey-section">
+                {(personalInfo.educationType === "Школа" ? grades : course).map(level => (
+                  <button
+                    key={level}
+                    className={`survey-button ${personalInfo.grade === level ? 'selected' : ''}`}
+                    onClick={() => handleGradeSelect(level)}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <button 
             className="survey-button action"
             onClick={handleEducationStep}
+          >
+            Далее
+          </button>
+        </div>
+      ) : step === 1.5 ? (
+        <div className="survey-section">
+          <h2 className="survey-title">Вопросы для учеников 9 класса</h2>
+          
+          <div className="survey-section">
+            <label className="survey-subtitle">Ты уже решил(а), что будешь делать после 9 класса?</label>
+            <div className="survey-section">
+              {postNinthGradePlans.map(plan => (
+                <button
+                  key={plan}
+                  className={`survey-button ${personalInfo.postNinthGradePlan === plan ? 'selected' : ''}`}
+                  onClick={() => handlePostNinthGradePlanSelect(plan)}
+                >
+                  {plan}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {personalInfo.postNinthGradePlan === "другое" && (
+            <div className="survey-section">
+              <input
+                className="survey-input"
+                placeholder="Укажите свой вариант"
+                value={personalInfo.customPostNinthGradePlan}
+                onChange={handlePersonalInfoChange('customPostNinthGradePlan')}
+              />
+            </div>
+          )}
+
+          {(personalInfo.postNinthGradePlan === "остаться в своей школе" || 
+            personalInfo.postNinthGradePlan === "пойти в колледж" || 
+            personalInfo.postNinthGradePlan === "перейти в другую школу") && (
+            <div className="survey-section">
+              <label className="survey-subtitle">Какое направление ты рассматриваешь сейчас?</label>
+              <input
+                className="survey-input"
+                placeholder="Можно не отвечать"
+                value={personalInfo.consideringDirection}
+                onChange={handlePersonalInfoChange('consideringDirection')}
+              />
+            </div>
+          )}
+
+          <button 
+            className="survey-button action"
+            onClick={handlePostNinthGradeStep}
           >
             Далее
           </button>
@@ -488,28 +527,20 @@ const Survey = () => {
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <button 
-              className="survey-button"
-              onClick={() => setStep(2)}
-            >
-              Назад
-            </button>
-            <button 
-              className="survey-button action"
-              onClick={handleSubmit}
-              disabled={isSubmitting || Object.keys(ratings).length !== selectedBenefits.length}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="animate-spin mr-2" />
-                  Отправка...
-                </>
-              ) : (
-                'Отправить'
-              )}
-            </button>
-          </div>
+          <button 
+            className="survey-button action"
+            onClick={handleSubmit}
+            disabled={isSubmitting || Object.keys(ratings).length !== selectedBenefits.length}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin mr-2" />
+                Отправка...
+              </>
+            ) : (
+              'Отправить'
+            )}
+          </button>
         </div>
       ) : (
         <div className="survey-section" style={{ textAlign: 'center', padding: '48px 0' }}>
