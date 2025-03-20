@@ -5,7 +5,8 @@ import { Loader2 } from 'lucide-react';
 import '../styles/survey.css';
 
 const Survey = () => {
-  // Шаги: 0 - имя/фамилия/почта, 1 - выбор категории и класса, 1.5 - дополнительные вопросы для 9 класса, 2 - выбор преимуществ, 3 - ранжирование, 4 - благодарность
+  // Шаги: 0 - имя/фамилия/почта, 1 - выбор категории и класса, 2 - дополнительные вопросы для 9 класса, 
+  // 3 - выбор преимуществ, 4 - ранжирование, 5 - благодарность
   const [step, setStep] = useState(0);
   
   const [personalInfo, setPersonalInfo] = useState({
@@ -139,9 +140,9 @@ const Survey = () => {
     
     // Если выбрана школа и 9 класс, переходим на дополнительный шаг
     if (personalInfo.educationType === "Школа" && personalInfo.grade === "9 класс") {
-      setStep(1.5);
+      setStep(2); // Изменили с 1.5 на 2
     } else {
-      setStep(2);
+      setStep(3); // Изменили с 2 на 3
     }
   };
   
@@ -157,7 +158,7 @@ const Survey = () => {
     }
     
     setError('');
-    setStep(2);
+    setStep(3); // Изменили с 2 на 3
   };
 
   const getCustomBenefitsCount = () => {
@@ -209,7 +210,7 @@ const Survey = () => {
       return;
     }
     setError('');
-    setStep(3);
+    setStep(4); // Изменили с 3 на 4
   };
 
   const handleRatingChange = (benefit, rating) => {
@@ -282,7 +283,7 @@ const Survey = () => {
         }
 
         setLoadingMessage("");
-        setStep(4);  // Переход на страницу благодарности
+        setStep(5);  // Изменили с 4 на 5
     } catch (error) {
         setError('Ошибка: ' + error.message);
         setLoadingMessage("");
@@ -381,7 +382,7 @@ const Survey = () => {
             Далее
           </button>
         </div>
-      ) : step === 1.5 ? (
+      ) : step === 2 ? (
         <div className="survey-section">
           <h2 className="survey-title">Вопросы для учеников 9 класса</h2>
           
@@ -432,7 +433,7 @@ const Survey = () => {
             Далее
           </button>
         </div>
-      ) : step === 2 ? (
+      ) : step === 3 ? (
         <div>
           <h2 className="survey-title">Выберите от 3 до 10 преимуществ</h2>
           <p className="survey-counter">
@@ -492,7 +493,7 @@ const Survey = () => {
             })
           </button>
         </div>
-      ) : step === 3 ? (
+      ) : step === 4 ? (
         <div>
           <h2 className="survey-title">Расставьте приоритеты выбранным преимуществам</h2>
           <p className="survey-subtitle">
@@ -548,7 +549,7 @@ const Survey = () => {
         </div>
       )}
       
-      {error && step !== 4 && (
+      {error && step !== 5 && (
         <div className="survey-error">{error}</div>
       )}
       {loadingMessage && (
