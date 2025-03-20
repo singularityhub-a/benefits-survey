@@ -21,8 +21,8 @@
 .survey-button {
   display: flex;
   width: 100%;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;  /* изменено с left на flex-start */
+  justify-content: flex-start;  /* изменено с left на flex-start */
   padding: 16px;
   margin: 8px 0;
   font-size: 18px;
@@ -30,11 +30,13 @@
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   transition: all 0.2s;
-  height: auto; /* Позволит увеличить высоту */
-  min-height: 60px; /* Минимальная высота */
-  white-space: normal; /* Разрешить перенос слов */
-  padding: 16px; /* Увеличить отступы */
-  line-height: 1.3; /* Уменьшить межстрочный интервал */
+  height: auto;
+  min-height: 60px;
+  white-space: normal;
+  line-height: 1.3;
+  text-align: left;  /* добавлено */
+  word-break: break-word;  /* добавлено для переноса длинных слов */
+  hyphens: auto;  /* добавлено для правильной расстановки переносов */
 }
 
 .survey-button:hover {
