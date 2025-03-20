@@ -231,6 +231,10 @@ const Survey = () => {
     });
   };
 
+  const isRatingAvailable = (rating) => {
+    return !Object.values(ratings).includes(rating);
+  };
+  
   const handleSubmit = async () => {
     if (Object.keys(ratings).length !== selectedBenefits.length) {
         setError('Пожалуйста, оцените все выбранные преимущества');
