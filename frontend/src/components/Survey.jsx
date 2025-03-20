@@ -156,7 +156,7 @@ const Survey = () => {
       return;
     }
     
-    if (personalInfo.postNinthGradePlan === "другое" && !personalInfo.customPostNinthGradePlan.trim()) {
+    if (personalInfo.postNinthGradePlan === "Другое" && !personalInfo.customPostNinthGradePlan.trim()) {
       setError('Пожалуйста, укажите свой вариант');
       return;
     }
@@ -254,8 +254,8 @@ const Survey = () => {
     
     // Добавляем информацию о планах после 9 класса, если она есть
     if (personalInfo.postNinthGradePlan) {
-      const postNinthPlan = personalInfo.postNinthGradePlan === "другое" 
-        ? `другое: ${personalInfo.customPostNinthGradePlan}` 
+      const postNinthPlan = personalInfo.postNinthGradePlan === "Другое" 
+        ? `Другое: ${personalInfo.customPostNinthGradePlan}` 
         : personalInfo.postNinthGradePlan;
       
       institutionInfo += `, планы: ${postNinthPlan}`;
@@ -409,7 +409,7 @@ const Survey = () => {
             </div>
           </div>
 
-          {personalInfo.postNinthGradePlan === "другое" && (
+          {personalInfo.postNinthGradePlan === "Другое" && (
             <div className="survey-section">
               <input
                 className="survey-input"
@@ -420,9 +420,9 @@ const Survey = () => {
             </div>
           )}
 
-          {(personalInfo.postNinthGradePlan === "остаться в своей школе" || 
-            personalInfo.postNinthGradePlan === "пойти в колледж" || 
-            personalInfo.postNinthGradePlan === "перейти в другую школу") && (
+          {(personalInfo.postNinthGradePlan === "Остаться в своей школе" || 
+            personalInfo.postNinthGradePlan === "Пойти в колледж" || 
+            personalInfo.postNinthGradePlan === "Перейти в другую школу") && (
             <div className="survey-section">
               <label className="survey-subtitle">Какое направление ты рассматриваешь сейчас?</label>
               <input
