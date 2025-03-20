@@ -34,7 +34,6 @@
   min-height: 60px;
   white-space: normal;
   line-height: 1.3;
-  word-break: break-word;  /* добавлено для переноса длинных слов */
   hyphens: auto;  /* добавлено для правильной расстановки переносов */
 }
 
