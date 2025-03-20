@@ -21,8 +21,8 @@
 .survey-button {
   display: flex;
   width: 100%;
-  align-items: flex-start;  /* изменено с left на flex-start */
-  justify-content: flex-start;  /* изменено с left на flex-start */
+  align-items: center;  /* изменено с left на flex-start */
+  justify-content: center;  /* изменено с left на flex-start */
   padding: 16px;
   margin: 8px 0;
   font-size: 18px;
@@ -34,7 +34,6 @@
   min-height: 60px;
   white-space: normal;
   line-height: 1.3;
-  text-align: left;  /* добавлено */
   word-break: break-word;  /* добавлено для переноса длинных слов */
   hyphens: auto;  /* добавлено для правильной расстановки переносов */
 }
