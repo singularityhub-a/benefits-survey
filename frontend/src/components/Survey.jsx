@@ -427,7 +427,7 @@ const Survey = () => {
               <label className="survey-subtitle">Какое направление ты рассматриваешь сейчас?</label>
               <input
                 className="survey-input"
-                placeholder="Можно не отвечать"
+                placeholder=" "
                 value={personalInfo.consideringDirection}
                 onChange={handlePersonalInfoChange('consideringDirection')}
               />
