@@ -28,6 +28,7 @@ const Survey = () => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
+  const [randomizedNinthGradePlans, setRandomizedNinthGradePlans] = useState([]);
 
   // Варианты образования
   const educationTypes = ["Школа", "Колледж", "ВУЗ", "Я - родитель"];
@@ -39,13 +40,13 @@ const Survey = () => {
   
   // Варианты планов после 9 класса
   const postNinthGradePlans = [
-    "остаться в своей школе",
-    "пойти в колледж",
-    "перейти в другую школу",
-    "никуда не пойду",
-    "буду работать",
-    "пока не решил(а)",
-    "другое"
+    "Остаться в своей школе",
+    "Пойти в колледж",
+    "Перейти в другую школу",
+    "Никуда не пойду",
+    "Буду работать",
+    "Пока не решил(а)",
+    "Другое"
   ];
 
   useEffect(() => {
@@ -59,6 +60,9 @@ const Survey = () => {
           complete: (results) => {
             const benefits = results.data.map(row => row.benefit).filter(Boolean);
             setRandomizedBenefits([..._.shuffle(benefits), "Другое"]);
+            // Рандомизируем планы после 9 класса, но оставляем "другое" в конце
+            const regularPlans = postNinthGradePlans.filter(p => p !== "Другое");
+            setRandomizedNinthGradePlans([..._.shuffle(regularPlans), "Другое"]);
           },
           error: (error) => {
             console.error('Error parsing CSV:', error);
@@ -393,7 +397,7 @@ const Survey = () => {
           <div className="survey-section">
             <label className="survey-subtitle">Ты уже решил(а), что будешь делать после 9 класса?</label>
             <div className="survey-section">
-              {postNinthGradePlans.map(plan => (
+              {randomizedNinthGradePlans.map(plan => (
                 <button
                   key={plan}
                   className={`survey-button ${personalInfo.postNinthGradePlan === plan ? 'selected' : ''}`}
