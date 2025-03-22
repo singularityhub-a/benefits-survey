@@ -443,7 +443,7 @@ const Survey = () => {
         </div>
       ) : step === 3 ? (
         <div>
-          <h2 className="survey-title">Выберите от 3 до 10 преимуществ</h2>
+          <h2 className="survey-title">Выберите от 3 до 10 преимуществ идеального учебного заведения</h2>
           <p className="survey-counter">
             Выбрано: {selectedBenefits.length} (минимум 3, максимум 10)
           </p>
