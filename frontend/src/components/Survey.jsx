@@ -519,6 +519,9 @@ const Survey = () => {
           <p className="survey-subtitle">
             1 — самое важное качество, {selectedBenefits.length} - наименее важное
           </p>
+          <p className="survey-instruction">
+            Чтобы отменить выбранную оценку важности, нажмите на неё ещё раз
+          </p>
 
           <div className="survey-section">
             {selectedBenefits.map((benefit) => (
