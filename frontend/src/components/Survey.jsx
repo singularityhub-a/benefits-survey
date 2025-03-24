@@ -219,6 +219,16 @@ const Survey = () => {
 
   const handleRatingChange = (benefit, rating) => {
     setError('');
+    
+    // Если пользователь нажимает на уже выбранный ранг, удаляем его
+    if (ratings[benefit] === rating) {
+      const newRatings = { ...ratings };
+      delete newRatings[benefit];
+      setRatings(newRatings);
+      return;
+    }
+    
+    // Если этот ранг уже назначен другому преимуществу, удаляем его оттуда
     const benefitWithCurrentRating = Object.entries(ratings).find(([_, value]) => value === rating);
     if (benefitWithCurrentRating) {
       const [oldBenefit] = benefitWithCurrentRating;
@@ -229,14 +239,16 @@ const Survey = () => {
       }
     }
     
+    // Назначаем новый ранг выбранному преимуществу
     setRatings({
       ...ratings,
       [benefit]: rating
     });
   };
 
-  const isRatingAvailable = (rating) => {
-    return !Object.values(ratings).includes(rating);
+  const isRatingAvailable = (benefit, rating) => {
+    // Ранг доступен, если он не используется никем или если он уже назначен текущему преимуществу
+    return !Object.values(ratings).includes(rating) || ratings[benefit] === rating;
   };
   
   const handleSubmit = async () => {
@@ -526,7 +538,7 @@ const Survey = () => {
                         ratings[benefit] === rating ? 'selected' : ''
                       }`}
                       onClick={() => handleRatingChange(benefit, rating)}
-                      disabled={!isRatingAvailable(rating) && ratings[benefit] !== rating}
+                      disabled={!isRatingAvailable(benefit, rating)}
                     >
                       {rating}
                     </button>
