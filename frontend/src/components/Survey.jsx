@@ -5,8 +5,8 @@ import { Loader2 } from 'lucide-react';
 import '../styles/survey.css';
 
 const Survey = () => {
-  // Шаги: 0 - имя/фамилия/почта, 1 - выбор категории и класса, 2 - дополнительные вопросы для 9 класса, 
-  // 3 - выбор преимуществ, 4 - ранжирование, 5 - благодарность
+  // Шаги: 0 - имя/фамилия/почта, 1 - выбор категории и класса, 2 - дополнительные вопросы для 9 класса,
+  // 2.5 - дополнительные вопросы для родителей, 3 - выбор преимуществ, 4 - ранжирование, 5 - благодарность
   const [step, setStep] = useState(0);
   
   const [personalInfo, setPersonalInfo] = useState({
@@ -17,7 +17,8 @@ const Survey = () => {
     grade: '', // для школьников
     postNinthGradePlan: '', // планы после 9 класса
     customPostNinthGradePlan: '', // для варианта "другое"
-    consideringDirection: '' // направление, которое рассматривает
+    consideringDirection: '', // направление, которое рассматривает
+    childEducationStatus: '' // для родителей - в каком классе/учебном заведении учится ребенок
   });
   
   const [randomizedBenefits, setRandomizedBenefits] = useState([]);
@@ -47,6 +48,12 @@ const Survey = () => {
     "Буду работать",
     "Пока не решил(а)",
     "Другое"
+  ];
+
+  // Варианты для статуса ребенка родителя
+  const childEducationOptions = [
+    "5 класс", "6 класс", "7 класс", "8 класс", "9 класс", 
+    "10 класс", "11 класс", "Уже учится в колледже", "Уже учится в ВУЗе"
   ];
 
   useEffect(() => {
@@ -142,9 +149,13 @@ const Survey = () => {
 
     setError('');
     
-    // Если выбрана школа и 9 класс, переходим на дополнительный шаг
+    // Если выбрана школа и 9 класс, переходим на дополнительный шаг для 9 класса
     if (personalInfo.educationType === "Школа" && personalInfo.grade === "9 класс") {
-      setStep(2); // Изменили с 1.5 на 2
+      setStep(2);
+    } 
+    // Если выбран вариант "Я - родитель", переходим на дополнительный шаг для родителей
+    else if (personalInfo.educationType === "Я - родитель") {
+      setStep(2.5);
     } else {
       setStep(3); // Изменили с 2 на 3
     }
@@ -163,6 +174,23 @@ const Survey = () => {
     
     setError('');
     setStep(3); // Изменили с 2 на 3
+  };
+
+  const handleChildEducationSelect = (status) => {
+    setPersonalInfo(prev => ({
+      ...prev,
+      childEducationStatus: status
+    }));
+  };
+
+  const handleParentStep = () => {
+    if (!personalInfo.childEducationStatus) {
+      setError('Пожалуйста, выберите класс/статус обучения вашего ребенка');
+      return;
+    }
+    
+    setError('');
+    setStep(3);
   };
 
   const getCustomBenefitsCount = () => {
@@ -261,22 +289,30 @@ const Survey = () => {
     setLoadingMessage("⏳ Отправка данных... Пожалуйста, не перезагружайте страницу.");
     setError('');
 
-    // Формируем информацию о месте обучения с учетом дополнительных данных для 9 класса
-    let institutionInfo = personalInfo.educationType + (personalInfo.grade ? `, ${personalInfo.grade}` : '');
+    // Формируем информацию о месте обучения с учетом статуса родителя
+    let institutionInfo;
     
-    // Добавляем информацию о планах после 9 класса, если она есть
-    if (personalInfo.postNinthGradePlan) {
-      const postNinthPlan = personalInfo.postNinthGradePlan === "Другое" 
-        ? `Другое: ${personalInfo.customPostNinthGradePlan}` 
-        : personalInfo.postNinthGradePlan;
+    if (personalInfo.educationType === "Я - родитель") {
+      institutionInfo = `${personalInfo.educationType}, ребенок: ${personalInfo.childEducationStatus}`;
+    } else {
+      // Формируем информацию о месте обучения с учетом дополнительных данных для 9 класса
+      institutionInfo = personalInfo.educationType + (personalInfo.grade ? `, ${personalInfo.grade}` : '');
       
-      institutionInfo += `, планы: ${postNinthPlan}`;
+      // Добавляем информацию о планах после 9 класса, если она есть
+      if (personalInfo.postNinthGradePlan) {
+        const postNinthPlan = personalInfo.postNinthGradePlan === "Другое" 
+          ? `Другое: ${personalInfo.customPostNinthGradePlan}` 
+          : personalInfo.postNinthGradePlan;
+        
+        institutionInfo += `, планы: ${postNinthPlan}`;
+      }
+      
+      // Добавляем информацию о направлении, если она есть
+      if (personalInfo.consideringDirection) {
+        institutionInfo += `, направление: ${personalInfo.consideringDirection}`;
+      }
     }
-    
-    // Добавляем информацию о направлении, если она есть
-    if (personalInfo.consideringDirection) {
-      institutionInfo += `, направление: ${personalInfo.consideringDirection}`;
-    }
+
 
     const data = {
         first_name: personalInfo.firstName,
@@ -398,6 +434,32 @@ const Survey = () => {
           <button 
             className="survey-button action"
             onClick={handleEducationStep}
+          >
+            Далее
+          </button>
+        </div>
+      ) : step === 2.5 ? (
+        <div className="survey-section">
+          <h2 className="survey-title">Информация о вашем ребенке</h2>
+          
+          <div className="survey-section">
+            <label className="survey-subtitle">В каком классе/учебном заведении учится ваш ребенок?</label>
+            <div className="survey-section">
+              {childEducationOptions.map(option => (
+                <button
+                  key={option}
+                  className={`survey-button ${personalInfo.childEducationStatus === option ? 'selected' : ''}`}
+                  onClick={() => handleChildEducationSelect(option)}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
+      
+          <button 
+            className="survey-button action"
+            onClick={handleParentStep}
           >
             Далее
           </button>
