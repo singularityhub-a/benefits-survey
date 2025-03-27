@@ -197,7 +197,7 @@
 .category-title {
   font-size: 22px;
   font-weight: 600;
-  color: #334155;
+  color: #808080;
   margin: 0;
   display: flex;
   align-items: center;
@@ -212,7 +212,7 @@
 
 .category-toggle {
   font-size: 16px;
-  color: #64748b;
+  color: #808080;
   transition: transform 0.2s ease;
 }
 
