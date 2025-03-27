@@ -190,8 +190,9 @@
   padding-bottom: 8px;
 }
 
-.category-header:hover {
-  opacity: 0.8;
+.category-title-wrapper {
+  display: flex;
+  align-items: center;
 }
 
 .category-title {
@@ -199,13 +200,10 @@
   font-weight: 600;
   color: #808080;
   margin: 0;
-  display: flex;
-  align-items: center;
 }
 
 .selected-count {
-  margin-left: 8px;
-  font-size: 18px;
+  font-size: 22px;
   color: #64748b;
   font-weight: 500;
 }
@@ -213,14 +211,6 @@
 .category-toggle {
   font-size: 16px;
   color: #808080;
-  transition: transform 0.2s ease;
-}
-
-.category-benefits {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #e2e8f0;
+  min-width: 20px;
+  text-align: center;
 }
