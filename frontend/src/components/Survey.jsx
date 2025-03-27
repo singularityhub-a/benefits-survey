@@ -21,7 +21,9 @@ const Survey = () => {
     childEducationStatus: '' // для родителей - в каком классе/учебном заведении учится ребенок
   });
   
-  const [randomizedBenefits, setRandomizedBenefits] = useState([]);
+  const [benefitsByCategory, setBenefitsByCategory] = useState({});
+  const [categoriesOrder, setCategoriesOrder] = useState([]);
+  const [expandedCategories, setExpandedCategories] = useState({});
   const [selectedBenefits, setSelectedBenefits] = useState([]);
   const [customBenefit, setCustomBenefit] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
@@ -65,8 +67,37 @@ const Survey = () => {
         Papa.parse(text, {
           header: true,
           complete: (results) => {
-            const benefits = results.data.map(row => row.benefit).filter(Boolean);
-            setRandomizedBenefits([..._.shuffle(benefits), "Другое"]);
+            // Группируем преимущества по категориям
+            const benefitsGrouped = {};
+            
+            results.data.forEach(row => {
+              if (row.benefit && row.category) {
+                if (!benefitsGrouped[row.category]) {
+                  benefitsGrouped[row.category] = [];
+                }
+                benefitsGrouped[row.category].push(row.benefit);
+              }
+            });
+            
+            // Перемешиваем преимущества внутри каждой категории
+            Object.keys(benefitsGrouped).forEach(category => {
+              benefitsGrouped[category] = _.shuffle(benefitsGrouped[category]);
+            });
+            
+            // Сохраняем категории в случайном порядке
+            const shuffledCategories = _.shuffle(Object.keys(benefitsGrouped));
+            
+            // Инициализируем все категории как свернутые
+            const initialExpandedState = {};
+            shuffledCategories.forEach(category => {
+              initialExpandedState[category] = false; // false - категория свернута
+            });
+            initialExpandedState["Свой вариант"] = false;
+            
+            setBenefitsByCategory(benefitsGrouped);
+            setCategoriesOrder(shuffledCategories);
+            setExpandedCategories(initialExpandedState);
+            
             // Рандомизируем планы после 9 класса, но оставляем "другое" в конце
             const regularPlans = postNinthGradePlans.filter(p => p !== "Другое");
             setRandomizedNinthGradePlans([..._.shuffle(regularPlans), "Другое"]);
@@ -234,6 +265,19 @@ const Survey = () => {
     } else {
       setError('Можно выбрать максимум 10 преимуществ');
     }
+  };
+
+  const toggleCategory = (category) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [category]: !prev[category]
+    }));
+  };
+  
+  const countSelectedInCategory = (category) => {
+    return benefitsByCategory[category]?.filter(benefit => 
+      selectedBenefits.includes(benefit)
+    ).length || 0;
   };
 
   const handleBenefitsStep = () => {
@@ -522,29 +566,81 @@ const Survey = () => {
             Выбрано: {selectedBenefits.length} (минимум 3, максимум 10)
           </p>
           
-          <div className="survey-section">
-            {randomizedBenefits.map((benefit) => (
-              <button
-                key={benefit}
-                className={`survey-button ${
-                  selectedBenefits.includes(benefit) ? 'selected' : ''
-                }`}
-                onClick={() => handleBenefitSelection(benefit)}
+
+          <div className="benefits-categories">
+            {categoriesOrder.map(category => {
+              const selectedCount = countSelectedInCategory(category);
+              return (
+                <div key={category} className="benefit-category">
+                  <div 
+                    className="category-header" 
+                    onClick={() => toggleCategory(category)}
+                  >
+                    <h3 className="category-title">
+                      {category} 
+                      {selectedCount > 0 && <span className="selected-count">({selectedCount})</span>}
+                    </h3>
+                    <div className="category-toggle">
+                      {expandedCategories[category] ? '▼' : '▶'}
+                    </div>
+                  </div>
+                  
+                  {expandedCategories[category] && (
+                    <div className="category-benefits">
+                      {benefitsByCategory[category]?.map(benefit => (
+                        <button
+                          key={benefit}
+                          className={`survey-button ${selectedBenefits.includes(benefit) ? 'selected' : ''}`}
+                          onClick={() => handleBenefitSelection(benefit)}
+                        >
+                          {benefit}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            
+            {/* Категория "Свой вариант" */}
+            <div className="benefit-category">
+              <div 
+                className="category-header" 
+                onClick={() => toggleCategory("Свой вариант")}
               >
-                {benefit}
-              </button>
-            ))}
-            {selectedBenefits.filter(b => b.startsWith("Другое:")).map((benefit) => (
-              <button
-                key={benefit}
-                className="survey-button selected"
-                onClick={() => {
-                  setSelectedBenefits(selectedBenefits.filter(b => b !== benefit));
-                }}
-              >
-                {benefit}
-              </button>
-            ))}
+                <h3 className="category-title">
+                  Свой вариант
+                  {getCustomBenefitsCount() > 0 && 
+                    <span className="selected-count">({getCustomBenefitsCount()})</span>
+                  }
+                </h3>
+                <div className="category-toggle">
+                  {expandedCategories["Свой вариант"] ? '▼' : '▶'}
+                </div>
+              </div>
+              
+              {expandedCategories["Свой вариант"] && (
+                <div className="category-benefits">
+                  <button
+                    className="survey-button"
+                    onClick={() => handleBenefitSelection("Другое")}
+                  >
+                    Другое
+                  </button>
+                  {selectedBenefits.filter(b => b.startsWith("Другое:")).map((benefit) => (
+                    <button
+                      key={benefit}
+                      className="survey-button selected"
+                      onClick={() => {
+                        setSelectedBenefits(selectedBenefits.filter(b => b !== benefit));
+                      }}
+                    >
+                      {benefit}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {showCustomInput && (
