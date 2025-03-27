@@ -561,11 +561,15 @@ const Survey = () => {
         </div>
       ) : step === 3 ? (
         <div>
+          <div className="sticky-counter">
+            <h3>Качества идеального учебного заведения</h3>
+            <div className="survey-counter">
+              Выбрано: <span className="counter-badge">{selectedBenefits.length}/10</span> (минимум 3)
+            </div>
+          </div>
           <h2 className="survey-title">Отметьте от 3 до 10 качеств идеального для ВАС учебного заведения</h2>
-          <p className="survey-counter">
-            Выбрано: {selectedBenefits.length} (минимум 3, максимум 10)
-          </p>
-          
+    
+
 
           <div className="benefits-categories">
             {categoriesOrder.map(category => {
