@@ -572,17 +572,20 @@ const Survey = () => {
               const selectedCount = countSelectedInCategory(category);
               return (
                 <div key={category} className="benefit-category">
+                 
                   <div 
                     className="category-header" 
                     onClick={() => toggleCategory(category)}
                   >
-                    <h3 className="category-title">
-                      {category} 
-                      {selectedCount > 0 && <span className="selected-count">({selectedCount})</span>}
-                    </h3>
-                    <div className="category-toggle">
-                      {expandedCategories[category] ? '▼' : '▶'}
+                    <div className="category-title-wrapper">
+                      <h3 className="category-title">
+                        {category}
+                        {selectedCount > 0 && <span className="selected-count"> ({selectedCount})</span>}
+                      </h3>
                     </div>
+                    <span className="category-toggle">
+                      {expandedCategories[category] ? '▼' : '▶'}
+                    </span>
                   </div>
                   
                   {expandedCategories[category] && (
@@ -604,19 +607,22 @@ const Survey = () => {
             
             {/* Категория "Свой вариант" */}
             <div className="benefit-category">
+            
               <div 
                 className="category-header" 
                 onClick={() => toggleCategory("Свой вариант")}
               >
-                <h3 className="category-title">
-                  Свой вариант
-                  {getCustomBenefitsCount() > 0 && 
-                    <span className="selected-count">({getCustomBenefitsCount()})</span>
-                  }
-                </h3>
-                <div className="category-toggle">
-                  {expandedCategories["Свой вариант"] ? '▼' : '▶'}
+                <div className="category-title-wrapper">
+                  <h3 className="category-title">
+                    Свой вариант
+                    {getCustomBenefitsCount() > 0 && 
+                      <span className="selected-count"> ({getCustomBenefitsCount()})</span>
+                    }
+                  </h3>
                 </div>
+                <span className="category-toggle">
+                  {expandedCategories["Свой вариант"] ? '▼' : '▶'}
+                </span>
               </div>
               
               {expandedCategories["Свой вариант"] && (
