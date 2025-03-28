@@ -116,6 +116,24 @@ const Survey = () => {
     loadBenefits();
   }, []);
 
+   
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (step > 0 && step < 5) {
+        // Если пользователь начал, но не закончил опрос
+        saveIncompleteProgress(step);
+        
+        // Стандартное сообщение для пользователя
+        e.preventDefault();
+        e.returnValue = "Вы уверены, что хотите покинуть страницу? Ваши ответы могут быть не сохранены.";
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [step, personalInfo, selectedBenefits, ratings]);
+
   const handlePersonalInfoChange = (field) => (e) => {
     setPersonalInfo(prev => ({
       ...prev,
@@ -286,9 +304,11 @@ const Survey = () => {
       return;
     }
     setError('');
+    saveIncompleteProgress(3);
     setStep(4); // Изменили с 3 на 4
   };
 
+  
   const handleRatingChange = (benefit, rating) => {
     setError('');
     
@@ -389,6 +409,59 @@ const Survey = () => {
         setLoadingMessage("");
     } finally {
         setIsSubmitting(false);
+    }
+  };
+
+    // Добавьте эту функцию перед return в компоненте Survey
+  const saveIncompleteProgress = async (currentStep) => {
+    // Пропускаем, если у нас нет базовой информации
+    if (!personalInfo.firstName || !personalInfo.lastName || !personalInfo.email) {
+      return;
+    }
+    
+    // Формируем базовую информацию
+    let institutionInfo = "";
+    
+    if (personalInfo.educationType === "Я - родитель") {
+      institutionInfo = `${personalInfo.educationType}, ребенок: ${personalInfo.childEducationStatus || "не указано"}`;
+    } else {
+      institutionInfo = personalInfo.educationType + (personalInfo.grade ? `, ${personalInfo.grade}` : '');
+      
+      if (personalInfo.postNinthGradePlan) {
+        const postNinthPlan = personalInfo.postNinthGradePlan === "Другое" 
+          ? `Другое: ${personalInfo.customPostNinthGradePlan}` 
+          : personalInfo.postNinthGradePlan;
+        
+        institutionInfo += `, планы: ${postNinthPlan}`;
+      }
+      
+      if (personalInfo.consideringDirection) {
+        institutionInfo += `, направление: ${personalInfo.consideringDirection}`;
+      }
+    }
+    
+    // Добавляем метку незавершенного опроса и номер шага
+    institutionInfo += ` [INCOMPLETE_STEP_${currentStep}]`;
+  
+    const data = {
+      first_name: personalInfo.firstName,
+      last_name: personalInfo.lastName,
+      email: personalInfo.email,
+      institution: institutionInfo,
+      benefits: selectedBenefits.map((benefit) => ({
+        benefit: benefit,
+        priority: ratings[benefit] || 0
+      }))
+    };
+  
+    try {
+      await fetch('https://benefits-survey-czag.onrender.com/api/survey/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+    } catch (error) {
+      console.error('Error saving incomplete progress:', error);
     }
   };
 
