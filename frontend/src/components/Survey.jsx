@@ -58,6 +58,8 @@ const Survey = () => {
     "10 класс", "11 класс", "Уже учится в колледже", "Уже учится в ВУЗе"
   ];
 
+  const [stepCompleted, setStepCompleted] = useState({});
+
   useEffect(() => {
     const loadBenefits = async () => {
       try {
@@ -304,7 +306,7 @@ const Survey = () => {
       return;
     }
     setError('');
-    saveIncompleteProgress(3);
+    setStepCompleted(prev => ({ ...prev, 3: true }));
     setStep(4); // Изменили с 3 на 4
   };
 
@@ -412,8 +414,13 @@ const Survey = () => {
     }
   };
 
-    // Добавьте эту функцию перед return в компоненте Survey
+
   const saveIncompleteProgress = async (currentStep) => {
+    // Проверяем, не был ли этот шаг уже успешно завершен
+    if (stepCompleted[currentStep]) {
+      return;
+    }
+    
     // Пропускаем, если у нас нет базовой информации
     if (!personalInfo.firstName || !personalInfo.lastName || !personalInfo.email) {
       return;
@@ -465,6 +472,7 @@ const Survey = () => {
     }
   };
 
+   
 
   return (
     <div className="survey-container">
