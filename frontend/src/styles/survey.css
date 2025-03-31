@@ -101,7 +101,7 @@
 }
 
 .rating-button {
-  width: 40px;
+  min-width: 60px;
   height: 40px;
   display: flex;
   align-items: center;
@@ -110,6 +110,8 @@
   border-radius: 8px;
   font-size: 16px;
   background: #fff;
+  padding: 0 8px;
+  gap: 2px;
 }
 
 .rating-button.selected {
