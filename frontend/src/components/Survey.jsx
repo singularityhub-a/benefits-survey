@@ -283,7 +283,7 @@ const Survey = () => {
     } else if (selectedBenefits.length < 10) {
       setSelectedBenefits([...selectedBenefits, benefit]);
     } else {
-      setError('Можно выбрать максимум 10 преимуществ');
+      setError('Можно выбрать максимум 10 качеств');
     }
   };
 
@@ -302,7 +302,7 @@ const Survey = () => {
 
   const handleBenefitsStep = () => {
     if (selectedBenefits.length < 3) {
-      setError('Пожалуйста, выберите минимум 3 преимущества');
+      setError('Пожалуйста, выберите минимум 3 качества');
       return;
     }
     setError('');
@@ -347,7 +347,7 @@ const Survey = () => {
   
   const handleSubmit = async () => {
     if (Object.keys(ratings).length !== selectedBenefits.length) {
-        setError('Пожалуйста, оцените все выбранные преимущества');
+        setError('Пожалуйста, оцените все выбранные качества');
         return;
     }
 
@@ -785,7 +785,8 @@ const Survey = () => {
                       ratings[benefit] === 1 ? '🥇' : 
                       ratings[benefit] === 2 ? '🥈' : 
                       ratings[benefit] === 3 ? '🥉' : 
-                      '🗿'
+                      ratings[benefit] === selectedBenefits.length ? '🗿' : 
+                      ''
                     } ${ratings[benefit]}` : 
                     'Не оценено, 1 — самое важное качество'}
                 </div>
@@ -799,7 +800,7 @@ const Survey = () => {
                     if (rating === 1) emoji = '🥇';
                     else if (rating === 2) emoji = '🥈';
                     else if (rating === 3) emoji = '🥉';
-                    else if (rating > 3) emoji = '🗿';
+                    else if (rating === selectedBenefits.length) emoji = '🗿'; // Только для последнего места;
                     
                     return (
                       <button
