@@ -760,8 +760,8 @@ const Survey = () => {
             disabled={selectedBenefits.length < 3}
           >
             Далее ({selectedBenefits.length} {
-              selectedBenefits.length === 1 ? 'преимущество' : 
-              selectedBenefits.length < 5 ? 'преимущества' : 'преимуществ'
+              selectedBenefits.length === 1 ? 'качество' : 
+              selectedBenefits.length < 5 ? 'качества' : 'качеств'
             })
           </button>
         </div>
