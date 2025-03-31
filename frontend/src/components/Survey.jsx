@@ -783,18 +783,27 @@ const Survey = () => {
                   {Array.from(
                     {length: selectedBenefits.length}, 
                     (_, i) => i + 1
-                  ).map((rating) => (
-                    <button
-                      key={rating}
-                      className={`rating-button ${
-                        ratings[benefit] === rating ? 'selected' : ''
-                      }`}
-                      onClick={() => handleRatingChange(benefit, rating)}
-                      disabled={!isRatingAvailable(benefit, rating)}
-                    >
-                      {rating}
-                    </button>
-                  ))}
+                  ).map((rating) => {
+                    // Определяем эмодзи в зависимости от рейтинга
+                    let emoji = '';
+                    if (rating === 1) emoji = '🥇';
+                    else if (rating === 2) emoji = '🥈';
+                    else if (rating === 3) emoji = '🥉';
+                    else if (rating > 3) emoji = '🗿';
+                    
+                    return (
+                      <button
+                        key={rating}
+                        className={`rating-button ${
+                          ratings[benefit] === rating ? 'selected' : ''
+                        }`}
+                        onClick={() => handleRatingChange(benefit, rating)}
+                        disabled={!isRatingAvailable(benefit, rating)}
+                      >
+                        {emoji} {rating}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))}
