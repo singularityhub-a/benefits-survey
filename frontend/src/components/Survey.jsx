@@ -714,7 +714,7 @@ const Survey = () => {
                 <div className="category-benefits">
                   <button
                     className="survey-button"
-                    onClick={() => handleBenefitSelection("Другое")}
+                    onClick={() => setShowCustomInput(true)}
                   >
                     Другое
                   </button>
@@ -729,27 +729,30 @@ const Survey = () => {
                       {benefit}
                     </button>
                   ))}
+                  
+                  {showCustomInput && (
+                    <div className="custom-benefit-input">
+                      <input
+                        className="survey-input"
+                        value={customBenefit}
+                        onChange={(e) => setCustomBenefit(e.target.value)}
+                        placeholder="Введите свой вариант"
+                      />
+                      <button 
+                        className="survey-button action"
+                        onClick={handleAddCustomBenefit}
+                      >
+                        Добавить
+                      </button>
+                    </div>
+                  )}
+                 
                 </div>
               )}
             </div>
           </div>
 
-          {showCustomInput && (
-            <div className="survey-section">
-              <input
-                className="survey-input"
-                value={customBenefit}
-                onChange={(e) => setCustomBenefit(e.target.value)}
-                placeholder="Введите своё преимущество"
-              />
-              <button 
-                className="survey-button action"
-                onClick={handleAddCustomBenefit}
-              >
-                Добавить
-              </button>
-            </div>
-          )}
+          {/* Поле ввода своего варианта теперь внутри категории */}
 
           <button 
             className="survey-button action"
