@@ -777,7 +777,14 @@ const Survey = () => {
               <div key={benefit} className="rating-card">
                 <div className="rating-title">{benefit}</div>
                 <div className="rating-status">
-                  {ratings[benefit] ? `Приоритет: ${ratings[benefit]}` : 'Не оценено'}
+                  {ratings[benefit] ? 
+                    `Приоритет: ${
+                      ratings[benefit] === 1 ? '🥇' : 
+                      ratings[benefit] === 2 ? '🥈' : 
+                      ratings[benefit] === 3 ? '🥉' : 
+                      '🗿'
+                    } ${ratings[benefit]}` : 
+                    'Не оценено, 1 — самое важное качество'}
                 </div>
                 <div className="rating-buttons">
                   {Array.from(
