@@ -5,8 +5,11 @@ import { Loader2 } from 'lucide-react';
 import '../styles/survey.css';
 
 const Survey = () => {
+  // Конфигурация - можно легко отключить дополнительный вопрос
+  const ENABLE_PARENTS_INTERVIEW_QUESTION = true; // Поменяйте на false, чтобы отключить вопрос
+  
   // Шаги: 0 - имя/фамилия/почта, 1 - выбор категории и класса, 2 - дополнительные вопросы для 9 класса,
-  // 2.5 - дополнительные вопросы для родителей, 3 - выбор преимуществ, 4 - ранжирование, 5 - благодарность
+  // 2.5 - дополнительные вопросы для родителей, 3 - выбор преимуществ, 4 - ранжирование, 4.5 - дополнительный вопрос для родителей 9-классников, 5 - благодарность
   const [step, setStep] = useState(0);
   
   const [personalInfo, setPersonalInfo] = useState({
@@ -18,7 +21,8 @@ const Survey = () => {
     postNinthGradePlan: '', // планы после 9 класса
     customPostNinthGradePlan: '', // для варианта "другое"
     consideringDirection: '', // направление, которое рассматривает
-    childEducationStatus: '' // для родителей - в каком классе/учебном заведении учится ребенок
+    childEducationStatus: '', // для родителей - в каком классе/учебном заведении учится ребенок
+    contactPhone: '' // для контактов родителей 9-классников
   });
   
   const [benefitsByCategory, setBenefitsByCategory] = useState({});
@@ -357,7 +361,9 @@ const Survey = () => {
 
     // Формируем информацию о месте обучения с учетом статуса родителя
     let institutionInfo;
-    
+    if (ENABLE_PARENTS_INTERVIEW_QUESTION && personalInfo.contactPhone) {
+      institutionInfo += `, контакт: ${personalInfo.contactPhone}`;
+    }
     if (personalInfo.educationType === "Я - родитель") {
       institutionInfo = `${personalInfo.educationType}, ребенок: ${personalInfo.childEducationStatus}`;
     } else {
@@ -405,7 +411,13 @@ const Survey = () => {
         }
 
         setLoadingMessage("");
-        setStep(5);  // Изменили с 4 на 5
+        if (ENABLE_PARENTS_INTERVIEW_QUESTION && 
+            personalInfo.educationType === "Я - родитель" && 
+            personalInfo.childEducationStatus === "9 класс") {
+            setStep(4.5); // Новый шаг для родителей 9-классников
+        } else {
+            setStep(5); // Обычный переход к благодарности
+        }
     } catch (error) {
         setError('Ошибка: ' + error.message);
         setLoadingMessage("");
@@ -428,6 +440,10 @@ const Survey = () => {
     
     // Формируем базовую информацию
     let institutionInfo = "";
+
+    if (ENABLE_PARENTS_INTERVIEW_QUESTION && personalInfo.contactPhone) {
+      institutionInfo += `, контакт: ${personalInfo.contactPhone}`;
+    }
     
     if (personalInfo.educationType === "Я - родитель") {
       institutionInfo = `${personalInfo.educationType}, ребенок: ${personalInfo.childEducationStatus || "не указано"}`;
@@ -836,7 +852,36 @@ const Survey = () => {
             )}
           </button>
         </div>
+      ) : step === 4.5 ? (
+        <div className="survey-section">
+          <h2 className="survey-title">Исследование о выборе пути после 9 класса</h2>
+          <p className="survey-subtitle">
+            Мы проводим небольшое исследование о том, как родители девятиклассников помогают своим детям выбирать дальнейший путь. Нам очень интересно узнать Ваше мнение и опыт Вашей семьи! 
+          </p>
+          <p className="survey-subtitle">
+            Если Вы готовы в дополнение к опросу еще пообщаться с нами, оставляй свои контакты ниже и мы свяжемся, чтобы договориться о времени интервью. После интервью мы отправим Вам сертификат Ozon на 1000 рублей — в знак благодарности за Ваше время. 😊
+          </p>
+          
+          <div className="survey-section">
+            <label className="survey-subtitle">Телефон для связи (необязательно)</label>
+            <input
+              className="survey-input"
+              placeholder="+7 (___) ___-__-__"
+              type="tel"
+              value={personalInfo.contactPhone}
+              onChange={handlePersonalInfoChange('contactPhone')}
+            />
+          </div>
+      
+          <button 
+            className="survey-button action"
+            onClick={() => setStep(5)}
+          >
+            {personalInfo.contactPhone ? 'Отправить' : 'Пропустить'}
+          </button>
+        </div>
       ) : (
+        // Здесь следует оригинальный код с шагом 5
         <div className="survey-section" style={{ textAlign: 'center', padding: '48px 0' }}>
           <h2 className="survey-title">Спасибо за участие в опросе! Ваши ответы сохранены.</h2>
         </div>
