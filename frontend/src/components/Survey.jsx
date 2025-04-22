@@ -386,7 +386,7 @@ const Survey = () => {
         }
       } else {
         // Формируем информацию о месте обучения с учетом дополнительных данных для 9 класса
-        institutionInfo = personalInfo.educationType + (personalInfo.grade ? , ${personalInfo.grade} : '');
+        institutionInfo = personalInfo.educationType + (personalInfo.grade ? `, ${personalInfo.grade}` : '');
         // Добавляем информацию о планах после 9 класса, если она есть
         if (personalInfo.postNinthGradePlan) {
           const postNinthPlan = personalInfo.postNinthGradePlan === "Другое" 
