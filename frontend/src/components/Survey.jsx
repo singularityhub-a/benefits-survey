@@ -385,7 +385,21 @@ const Survey = () => {
           institutionInfo += `, контакт: ${personalInfo.contactPhone}`;
         }
       } else {
-        // ... (остальной код формирования institutionInfo)
+        // Формируем информацию о месте обучения с учетом дополнительных данных для 9 класса
+        institutionInfo = personalInfo.educationType + (personalInfo.grade ? , ${personalInfo.grade} : '');
+        // Добавляем информацию о планах после 9 класса, если она есть
+        if (personalInfo.postNinthGradePlan) {
+          const postNinthPlan = personalInfo.postNinthGradePlan === "Другое" 
+            ? `Другое: ${personalInfo.customPostNinthGradePlan}` 
+            : personalInfo.postNinthGradePlan;
+          institutionInfo += `, планы: ${postNinthPlan}`;
+        }
+  
+        // Добавляем информацию о направлении, если она есть
+  
+        if (personalInfo.consideringDirection) {
+          institutionInfo += `, направление: ${personalInfo.consideringDirection}`;
+        }
       }
   
       const data = {
