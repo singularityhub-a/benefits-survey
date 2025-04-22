@@ -361,11 +361,15 @@ const Survey = () => {
 
     // Формируем информацию о месте обучения с учетом статуса родителя
     let institutionInfo;
-    if (ENABLE_PARENTS_INTERVIEW_QUESTION && personalInfo.contactPhone) {
-      institutionInfo += `, контакт: ${personalInfo.contactPhone}`;
-    }
+    
     if (personalInfo.educationType === "Я - родитель") {
       institutionInfo = `${personalInfo.educationType}, ребенок: ${personalInfo.childEducationStatus}`;
+      // Добавляем контакт для родителей 9-классников
+      if (ENABLE_PARENTS_INTERVIEW_QUESTION && 
+          personalInfo.childEducationStatus === "9 класс" && 
+          personalInfo.contactPhone) {
+        institutionInfo += `, контакт: ${personalInfo.contactPhone}`;
+      }
     } else {
       // Формируем информацию о месте обучения с учетом дополнительных данных для 9 класса
       institutionInfo = personalInfo.educationType + (personalInfo.grade ? `, ${personalInfo.grade}` : '');
