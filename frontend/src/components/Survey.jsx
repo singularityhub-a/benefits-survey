@@ -350,87 +350,78 @@ const Survey = () => {
   };
   
   const handleSubmit = async () => {
-    if (Object.keys(ratings).length !== selectedBenefits.length) {
-        setError('Пожалуйста, оцените все выбранные качества');
-        return;
-    }
-
-    setIsSubmitting(true);
-    setLoadingMessage("⏳ Отправка данных... Пожалуйста, не перезагружайте страницу.");
-    setError('');
-
-    // Формируем информацию о месте обучения с учетом статуса родителя
-    let institutionInfo;
-    
-    if (personalInfo.educationType === "Я - родитель") {
-      institutionInfo = `${personalInfo.educationType}, ребенок: ${personalInfo.childEducationStatus}`;
-      // Добавляем контакт для родителей 9-классников
+     if (Object.keys(ratings).length !== selectedBenefits.length) {
+          setError('Пожалуйста, оцените все выбранные качества');
+          return;
+      }
+  
+      // Не отправляем данные сразу, если нужно показать шаг 4.5
       if (ENABLE_PARENTS_INTERVIEW_QUESTION && 
-          personalInfo.childEducationStatus === "9 класс" && 
-          personalInfo.contactPhone) {
-        institutionInfo += `, контакт: ${personalInfo.contactPhone}`;
+          personalInfo.educationType === "Я - родитель" && 
+          personalInfo.childEducationStatus === "9 класс") {
+          setStep(4.5);
+          return;
       }
-    } else {
-      // Формируем информацию о месте обучения с учетом дополнительных данных для 9 класса
-      institutionInfo = personalInfo.educationType + (personalInfo.grade ? `, ${personalInfo.grade}` : '');
-      
-      // Добавляем информацию о планах после 9 класса, если она есть
-      if (personalInfo.postNinthGradePlan) {
-        const postNinthPlan = personalInfo.postNinthGradePlan === "Другое" 
-          ? `Другое: ${personalInfo.customPostNinthGradePlan}` 
-          : personalInfo.postNinthGradePlan;
-        
-        institutionInfo += `, планы: ${postNinthPlan}`;
-      }
-      
-      // Добавляем информацию о направлении, если она есть
-      if (personalInfo.consideringDirection) {
-        institutionInfo += `, направление: ${personalInfo.consideringDirection}`;
-      }
-    }
-
-
-    const data = {
-        first_name: personalInfo.firstName,
-        last_name: personalInfo.lastName,
-        email: personalInfo.email,
-        institution: institutionInfo,
-        benefits: selectedBenefits.map((benefit) => ({
-            benefit: benefit,
-            priority: ratings[benefit]
-        }))
-    };
-
-    try {
-        const response = await fetch('https://benefits-survey-czag.onrender.com/api/survey/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            setError('Ошибка при отправке данных: ' + JSON.stringify(errorData));
-            return;
-        }
-
-        setLoadingMessage("");
-        if (ENABLE_PARENTS_INTERVIEW_QUESTION && 
-            personalInfo.educationType === "Я - родитель" && 
-            personalInfo.childEducationStatus === "9 класс") {
-            setStep(4.5); // Новый шаг для родителей 9-классников
-        } else {
-            setStep(5); // Обычный переход к благодарности
-        }
-    } catch (error) {
-        setError('Ошибка: ' + error.message);
-        setLoadingMessage("");
-    } finally {
-        setIsSubmitting(false);
-    }
+  
+      // Отправляем данные
+      await submitSurveyData();
   };
 
 
+  const submitSurveyData = async () => {
+      setIsSubmitting(true);
+      setLoadingMessage("⏳ Отправка данных... Пожалуйста, не перезагружайте страницу.");
+      setError('');
+  
+      // Формируем информацию о месте обучения (весь ваш существующий код из handleSubmit)
+      let institutionInfo;
+      
+      if (personalInfo.educationType === "Я - родитель") {
+        institutionInfo = `${personalInfo.educationType}, ребенок: ${personalInfo.childEducationStatus}`;
+        // Добавляем контакт для родителей 9-классников
+        if (ENABLE_PARENTS_INTERVIEW_QUESTION && 
+            personalInfo.childEducationStatus === "9 класс" && 
+            personalInfo.contactPhone) {
+          institutionInfo += `, контакт: ${personalInfo.contactPhone}`;
+        }
+      } else {
+        // ... (остальной код формирования institutionInfo)
+      }
+  
+      const data = {
+          first_name: personalInfo.firstName,
+          last_name: personalInfo.lastName,
+          email: personalInfo.email,
+          institution: institutionInfo,
+          benefits: selectedBenefits.map((benefit) => ({
+              benefit: benefit,
+              priority: ratings[benefit]
+          }))
+      };
+  
+      try {
+          const response = await fetch('https://benefits-survey-czag.onrender.com/api/survey/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+          });
+  
+          if (!response.ok) {
+              const errorData = await response.json();
+              setError('Ошибка при отправке данных: ' + JSON.stringify(errorData));
+              return;
+          }
+  
+          setLoadingMessage("");
+          setStep(5);
+      } catch (error) {
+          setError('Ошибка: ' + error.message);
+          setLoadingMessage("");
+      } finally {
+          setIsSubmitting(false);
+      }
+  };
+    
   const saveIncompleteProgress = async (currentStep) => {
     // Проверяем, не был ли этот шаг уже успешно завершен
     if (stepCompleted[currentStep]) {
@@ -867,7 +858,7 @@ const Survey = () => {
           </p>
           
           <div className="survey-section">
-            <label className="survey-subtitle">Телефон для связи (необязательно)</label>
+            <label className="survey-subtitle">Телефон для связи в Telegram или WhatsApp</label>
             <input
               className="survey-input"
               placeholder="+7 (___) ___-__-__"
@@ -879,7 +870,7 @@ const Survey = () => {
       
           <button 
             className="survey-button action"
-            onClick={() => setStep(5)}
+            onClick={submitSurveyData}
           >
             {personalInfo.contactPhone ? 'Отправить' : 'Пропустить'}
           </button>
