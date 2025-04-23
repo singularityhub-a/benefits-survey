@@ -22,7 +22,8 @@ const Survey = () => {
     customPostNinthGradePlan: '', // для варианта "другое"
     consideringDirection: '', // направление, которое рассматривает
     childEducationStatus: '', // для родителей - в каком классе/учебном заведении учится ребенок
-    contactPhone: '' // для контактов родителей 9-классников
+    contactPhone: '', // для контактов родителей 9-классников
+    dataConsentGiven: false // согласие на обработку персональных данных
   });
   
   const [benefitsByCategory, setBenefitsByCategory] = useState({});
@@ -369,6 +370,11 @@ const Survey = () => {
 
 
   const submitSurveyData = async () => {
+      if (personalInfo.contactPhone && !personalInfo.dataConsentGiven) {
+        setError('Для отправки контактного номера необходимо согласие на обработку персональных данных');
+        return;
+      }
+    
       setIsSubmitting(true);
       setLoadingMessage("⏳ Отправка данных... Пожалуйста, не перезагружайте страницу.");
       setError('');
@@ -383,6 +389,8 @@ const Survey = () => {
             personalInfo.childEducationStatus === "9 класс" && 
             personalInfo.contactPhone) {
           institutionInfo += `, контакт: ${personalInfo.contactPhone}`;
+              // Добавляем информацию о согласии
+          institutionInfo += `, согласие на обработку ПД: ${personalInfo.dataConsentGiven ? 'Да' : 'Нет'}`;
         }
       } else {
         // Формируем информацию о месте обучения с учетом дополнительных данных для 9 класса
@@ -881,10 +889,30 @@ const Survey = () => {
               onChange={handlePersonalInfoChange('contactPhone')}
             />
           </div>
+
+          {personalInfo.contactPhone && (
+            <div className="consent-checkbox-container">
+              <label className="consent-label">
+                <input
+                  type="checkbox"
+                  checked={personalInfo.dataConsentGiven}
+                  onChange={(e) => setPersonalInfo(prev => ({
+                    ...prev,
+                    dataConsentGiven: e.target.checked
+                  }))}
+                  className="consent-checkbox"
+                />
+                <span className="consent-text">
+                  Я согласен на обработку моих персональных данных в целях текущего исследования
+                </span>
+              </label>
+            </div>
+          )}
       
           <button 
             className="survey-button action"
             onClick={submitSurveyData}
+            disabled={personalInfo.contactPhone && !personalInfo.dataConsentGiven}
           >
             {personalInfo.contactPhone ? 'Отправить' : 'Пропустить'}
           </button>
